@@ -1,770 +1,276 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Interfaz VTS LLAN/AUT</title>
-  <script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.development.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.development.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@babel/standalone/babel.min.js"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0/dist/chartjs-plugin-datalabels.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Inter:wght@400;500&display=swap" rel="stylesheet">
-  <style>
-    body {
-      background: linear-gradient(135deg, #0f172a, #1e293b);
-      position: relative;
-      overflow-x: hidden;
-      font-family: 'Inter', sans-serif;
-      color: #e2e8f0;
-    }
-    .container {
-      background: linear-gradient(145deg, #1e293b, #0f172a);
-      border: 2px solid rgba(96, 165, 250, 0.3);
-      border-radius: 1.5rem;
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
-      padding: 2rem;
-      margin: 1rem auto;
-      position: relative;
-      overflow: hidden;
-    }
-    .container::before {
-      content: '';
-      position: absolute;
-      top: -2px;
-      left: -2px;
-      right: -2px;
-      bottom: -2px;
-      border-radius: 1.5rem;
-      background: linear-gradient(45deg, #60a5fa, #a78bfa);
-      z-index: -1;
-      opacity: 0.2;
-    }
-    .header-container {
-      position: relative;
-      background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAACgCAMAAADkTV1aAAAAA1BMVEUAAACnej3aAAAASElEQVR4nO3BMQEAAADCoPVPbQwfoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPCHYAAACgAABT3c1YAAAAAElFTkSuQmCC') center/cover no-repeat;
-      background-blend-mode: overlay;
-      opacity: 0.9;
-      padding: 2rem 1rem;
-      border-radius: 1rem;
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
-      margin-bottom: 2rem;
-      text-align: center;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    .header-container::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(to bottom, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.6));
-      border-radius: 1rem;
-    }
-    .header-container h1, .header-container p {
-      position: relative;
-      z-index: 1;
-    }
-    .header-3d {
-      font-family: 'Poppins', sans-serif;
-      font-weight: 800;
-      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5), 
-                   -1px -1px 2px rgba(255, 255, 255, 0.2);
-    }
-    .custom-button {
-      background: linear-gradient(145deg, #1e40af, #3b82f6);
-      border: 2px solid #60a5fa;
-      border-radius: 0.75rem;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), inset 0 2px 4px rgba(255, 255, 255, 0.2);
-      transition: all 0.3s ease;
-      padding: 1rem 2rem;
-      font-family: 'Poppins', sans-serif;
-      font-weight: 600;
-      color: #ffffff;
-      position: relative;
-    }
-    .custom-button:hover {
-      background: linear-gradient(145deg, #2563eb, #60a5fa);
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3), inset 0 3px 6px rgba(255, 255, 255, 0.3);
-      transform: translateY(-2px);
-    }
-    .custom-select {
-      background: linear-gradient(145deg, #1e293b, #0f172a);
-      border: 2px solid #60a5fa;
-      border-radius: 0.5rem;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2), inset 0 1px 2px rgba(0, 0, 0, 0.5);
-      transition: all 0.3s ease;
-      font-family: 'Inter', sans-serif;
-    }
-    .custom-select:hover {
-      border-color: #93c5fd;
-      box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3), inset 0 2px 4px rgba(0, 0, 0, 0.5);
-    }
-    .table-header {
-      background: linear-gradient(to right, #7c3aed, #3b82f6);
-    }
-    .prospect-table-header {
-      background: linear-gradient(to right, #10b981, #34d399);
-    }
-    .section-frame {
-      background: #1e293b;
-      border: 2px solid rgba(96, 165, 250, 0.5);
-      border-radius: 1rem;
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
-      padding: 1.5rem;
-      position: relative;
-      overflow: hidden;
-    }
-    .section-frame::before {
-      content: '';
-      position: absolute;
-      top: -2px;
-      left: -2px;
-      right: -2px;
-      bottom: -2px;
-      border-radius: 1rem;
-      background: linear-gradient(45deg, #60a5fa, #a78bfa);
-      z-index: -1;
-      opacity: 0.1;
-    }
-    .section-title {
-      font-family: 'Poppins', sans-serif;
-      font-weight: 600;
-      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-      border-bottom: 2px solid #60a5fa;
-      padding-bottom: 0.5rem;
-      margin-bottom: 1rem;
-    }
-    .watermark {
-      position: absolute;
-      z-index: -1;
-      opacity: 0.15;
-      pointer-events: none;
-    }
-    .watermark-logo-roma {
-      bottom: 20px;
-      right: 20px;
-      width: 300px;
-      height: 100px;
-      background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAT4AAACgCAMAAADkTV1aAAAAA1BMVEUAAACnej3aAAAASElEQVR4nO3BMQEAAADCoPVPbQwfoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPCHYAAACgAABT3c1YAAAAAElFTkSuQmCC') no-repeat center;
-      background-size: contain;
-    }
-    @media (max-width: 640px) {
-      table { font-size: 0.65rem; }
-      th, td { padding: 0.4rem; }
-      .container { padding: 1rem; }
-      select { font-size: 0.8rem; padding: 0.5rem; }
-      h1 { font-size: 1.75rem; }
-      h2 { font-size: 1.5rem; }
-      canvas { max-height: 250px; }
-      .custom-button { padding: 0.75rem 1.5rem; font-size: 0.9rem; }
-      .section-frame { padding: 1rem; }
-    }
-    @media (min-width: 641px) {
-      table { font-size: 0.85rem; }
-      th, td { padding: 0.75rem; }
-      select { font-size: 0.9rem; padding: 0.75rem; }
-      canvas { max-height: 350px; }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Llanterama Tulancingo - Sistema de Inteligencia</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700;900&display=swap');
+        body { font-family: 'Outfit', sans-serif; background-color: #f1f5f9; }
+        .bg-llanterama { background: radial-gradient(circle at top, #002d5a 0%, #001f3f 100%); }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .card-current { background: #fefce8; border: 2px solid #eab308 !important; }
+        .shadow-pro { box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); }
+        .linea-pro { border-left: 8px solid #003366; } .linea-lub { border-left: 8px solid #f97316; }
+        .linea-moto { border-left: 8px solid #ef4444; } .linea-filt { border-left: 8px solid #22c55e; }
+        .linea-alc { border-left: 8px solid #8b5cf6; } .linea-rec { border-left: 8px solid #94a3b8; }
+        .fade-in { animation: fadeIn 0.8s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
 </head>
-<body class="min-h-screen">
-  <div class="watermark watermark-logo-roma"></div>
-  <div id="root" class="container mx-auto"></div>
+<body>
 
-  <script type="text/babel">
-    function parseNumber(value) {
-      if (!value || value === "") return 0;
-      const cleaned = String(value).replace(/[^0-9.-]+/g, '');
-      return Number(cleaned) || 0;
-    }
+    <div id="loader" class="fixed inset-0 bg-llanterama z-50 flex flex-col items-center justify-center text-white text-center p-6">
+        <div class="w-10 h-10 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p id="loader-text" class="text-[9px] font-bold tracking-[0.3em] uppercase opacity-50 italic underline">Conectando con la Bóveda</p>
+        <button id="retry-btn" onclick="location.reload()" class="hidden mt-4 bg-yellow-500 text-blue-900 px-6 py-2 rounded-full text-xs font-black uppercase">Reintentar Conexión</button>
+    </div>
 
-    function getMonthName(dateString) {
-      if (!dateString || dateString.trim() === "") return "Mes desconocido";
-      let date;
-      const cleanedDateString = dateString.trim().replace(/\s+/g, ' ');
-      
-      const formats = [
-        { regex: /^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2}):(\d{2})$/, parse: (match) => new Date(`${match[3]}-${match[2]}-${match[1]}T${match[4]}:${match[5]}:${match[6]}`) },
-        { regex: /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/, parse: (match) => new Date(`${match[3]}-${match[2]}-${match[1]}`) },
-        { regex: /^(\d{4})-(\d{1,2})-(\d{1,2})\s+(\d{1,2}):(\d{2}):(\d{2})$/, parse: (match) => new Date(`${match[1]}-${match[2]}-${match[3]}T${match[4]}:${match[5]}:${match[6]}`) },
-        { regex: /^(\d{4})-(\d{1,2})-(\d{1,2})$/, parse: (match) => new Date(`${match[1]}-${match[2]}-${match[3]}`) },
-        { regex: /^(\d{1,2})-(\d{1,2})-(\d{4})$/, parse: (match) => new Date(`${match[3]}-${match[1]}-${match[2]}`) },
-        { regex: /^(\d{4})\/(\d{1,2})\/(\d{1,2})$/, parse: (match) => new Date(`${match[1]}-${match[2]}-${match[3]}`) },
-      ];
-
-      for (const format of formats) {
-        const match = cleanedDateString.match(format.regex);
-        if (match) {
-          date = format.parse(match);
-          break;
-        }
-      }
-
-      if (!date || isNaN(date?.getTime())) {
-        date = new Date(cleanedDateString);
-      }
-
-      if (isNaN(date?.getTime())) {
-        const parts = cleanedDateString.split(/[\s\/-]+/);
-        if (parts.length >= 3) {
-          date = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
-          if (isNaN(date?.getTime())) {
-            date = new Date(`${parts[2]}-${parts[0]}-${parts[1]}`);
-          }
-        }
-      }
-
-      if (isNaN(date?.getTime())) {
-        console.warn(`No se pudo parsear la fecha: "${dateString}"`);
-        return "Mes desconocido";
-      }
-
-      const monthNames = [
-        "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-        "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
-      ];
-      return monthNames[date.getMonth()];
-    }
-
-    function SalesTable() {
-      const [data, setData] = React.useState([]);
-      const [filterVend, setFilterVend] = React.useState([]);
-      const [filterClas, setFilterClas] = React.useState("");
-      const [filterDate, setFilterDate] = React.useState("");
-      const [filterClients, setFilterClients] = React.useState([]);
-      const [view, setView] = React.useState("home");
-      const [passwordError, setPasswordError] = React.useState(""); // New state for password error
-      const tableRef = React.useRef(null);
-      const chartRef = React.useRef(null);
-      const chartInstanceRef = React.useRef(null);
-      const [error, setError] = React.useState(null);
-      const [isLoading, setIsLoading] = React.useState(true);
-
-      const vendorNames = {
-        "3": "Carlos Calderón",
-        "4": "Marco Hernández",
-        "6": "Miguel Lozada",
-        "5": "Ulises Alvarado",
-        "7": "Alfredo Tapia",
-        "8": "Empresarial/Talleres",
-        "12": "Ruben León",
-        "23": "Enrique Reséndiz",
-        "71": "Cecilia Pérez",
-        "72": "Oscar Flóres",
-        "22": "Cecilio Ivan",
-        "21": "Celene Soto"
-      };
-
-      const vendorColors = {
-        "3": "#FF6F61",
-        "4": "#D4A5A5",
-        "6": "#6B7280",
-        "5": "#FBBF24",
-        "7": "#34D399",
-        "8": "#60A5FA",
-        "12": "#F472B6",
-        "23": "#A78BFA",
-        "71": "#FCD34D",
-        "72": "#4ADE80",
-        "22": "#2DD4BF",
-        "21": "#F87171"
-      };
-
-      const vendorCodes = React.useMemo(() => [...new Set(data.map(item => item.codVend))].sort(), [data]);
-      const clasificaciones = React.useMemo(() => [...new Set(data.map(item => item.clasificacion))].sort(), [data]);
-      const fechas = React.useMemo(() => [...new Set(data.map(item => item.fecha))].sort(), [data]);
-      const clientes = React.useMemo(() => [...new Set(data.map(item => item.cliente))].sort(), [data]);
-
-      const filteredData = React.useMemo(() => {
-        let result = [...data];
-        if (filterVend.length > 0) result = result.filter(item => filterVend.includes(item.codVend));
-        if (filterClas) result = result.filter(item => item.clasificacion === filterClas);
-        if (filterDate) result = result.filter(item => item.fecha === filterDate);
-        if (filterClients.length > 0) {
-          result = result.filter(item => filterClients.includes(item.cliente));
-        }
-        return result.sort((a, b) => b.importe - a.importe);
-      }, [data, filterVend, filterClas, filterDate, filterClients]);
-
-      const totals = React.useMemo(() => {
-        return filteredData.reduce(
-          (acc, item) => {
-            acc.cantidad += item.cantidad;
-            acc.importe += item.importe;
-            return acc;
-          },
-          { cantidad: 0, importe: 0 }
-        );
-      }, [filteredData]);
-
-      const vendorTotals = React.useMemo(() => {
-        const totalsByVendor = filteredData.reduce((acc, item) => {
-          if (!acc[item.codVend]) {
-            acc[item.codVend] = 0;
-          }
-          acc[item.codVend] += item.cantidad;
-          return acc;
-        }, {});
-        return Object.entries(totalsByVendor)
-          .map(([vendor, cantidad]) => ({ vendor, cantidad }))
-          .sort((a, b) => b.cantidad - a.cantidad);
-      }, [filteredData]);
-
-      const getColor = (value, type) => {
-        if (type === "cantidad") return value > 15 ? "bg-green-500 text-black" : value < 5 ? "bg-red-500 text-white" : "bg-yellow-400 text-black";
-        return "";
-      };
-
-      React.useEffect(() => {
-        const csvUrl = "https://docs.google.com/spreadsheets/d/1Oa4a5rJp0W2IhIlAa5iwCCWOK9KkRgQp/export?format=csv";
-        const fetchData = () => {
-          const scrollPosition = tableRef.current ? tableRef.current.scrollLeft : 0;
-          Papa.parse(csvUrl, {
-            download: true,
-            header: true,
-            skipEmptyLines: true,
-            complete: (result) => {
-              const parsedData = result.data.map(row => ({
-                codVend: row["COD DE VEND"] || "",
-                cantidad: parseNumber(row["CANTIDAD"]),
-                importe: parseNumber(row["IMPORTE"]),
-                cliente: row["NOMBRE DEL CLIENTE"] || "",
-                codCliente: row["CODIGO DEL CLIENTE"] || "",
-                clasificacion: row["CLASIFICACION"] || "",
-                almacen: row["ALMACEN"] || "",
-                factura: row["FACTURA"] || "",
-                descuento: parseNumber(row["DESCUENTO"]),
-                descripcion: row["DESCRIPCION"] || "",
-                fecha: row["FECHA"] || "",
-              }));
-              setData(parsedData);
-              setError(null);
-              setIsLoading(false);
-              if (tableRef.current) {
-                tableRef.current.scrollLeft = scrollPosition;
-              }
-            },
-            error: (error) => {
-              console.error("Error al cargar el CSV desde Google Drive:", error);
-              setError("No se pudo cargar los datos. Por favor, verifica la conexión o la URL del CSV.");
-              setIsLoading(false);
-            },
-          });
-        };
-        fetchData();
-        const interval = setInterval(fetchData, 60000);
-        return () => clearInterval(interval);
-      }, []);
-
-      React.useEffect(() => {
-        if (chartRef.current && vendorTotals.length > 0 && view === "leaders") {
-          if (chartInstanceRef.current) {
-            chartInstanceRef.current.destroy();
-          }
-
-          const maxCantidad = Math.max(...vendorTotals.map(item => item.cantidad));
-          const suggestedMax = maxCantidad * 1.5;
-
-          const ctx = chartRef.current.getContext('2d');
-          chartInstanceRef.current = new Chart(ctx, {
-            type: 'bar',
-            data: {
-              labels: vendorTotals.map(item => vendorNames[item.vendor] || item.vendor),
-              datasets: [{
-                label: 'Cantidad por Vendedor',
-                data: vendorTotals.map(item => item.cantidad),
-                backgroundColor: vendorTotals.map(item => vendorColors[item.vendor] || '#FFFFFF'),
-                borderColor: '#FFFFFF',
-                borderWidth: 1,
-                barThickness: 15,
-              }],
-            },
-            options: {
-              indexAxis: 'x',
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: {
-                legend: { display: false },
-                tooltip: {
-                  backgroundColor: '#1e293b',
-                  titleColor: '#FFFFFF',
-                  bodyColor: '#FFFFFF',
-                  borderColor: '#60a5fa',
-                  borderWidth: 1,
-                },
-                datalabels: {
-                  anchor: 'end',
-                  align: 'top',
-                  color: '#FFFFFF',
-                  font: { size: 12, family: 'Inter' },
-                  backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                  borderRadius: 3,
-                  padding: 2,
-                  formatter: (value) => value.toLocaleString(),
-                  rotation: -45,
-                },
-              },
-              scales: {
-                x: {
-                  grid: { display: false },
-                  ticks: { color: '#e2e8f0', font: { size: 10, family: 'Inter' } },
-                },
-                y: {
-                  grid: { display: false },
-                  ticks: { color: '#e2e8f0', font: { size: 10, family: 'Inter' } },
-                  beginAtZero: true,
-                  suggestedMax: suggestedMax,
-                },
-              },
-              layout: {
-                padding: { top: 30 },
-              },
-            },
-            plugins: [ChartDataLabels],
-          });
-        }
-        return () => {
-          if (chartInstanceRef.current) {
-            chartInstanceRef.current.destroy();
-          }
-        };
-      }, [vendorTotals, view]);
-
-      const handleVendorChange = (e) => {
-        const selectedOptions = Array.from(e.target.selectedOptions).map(option => option.value);
-        if (selectedOptions.includes("")) {
-          setFilterVend([]);
-        } else {
-          const selected = selectedOptions.filter(option => option !== "").slice(0, 3);
-          setFilterVend(selected);
-        }
-      };
-
-      const handleClientChange = (e) => {
-        const selectedOptions = Array.from(e.target.selectedOptions).map(option => option.value);
-        if (selectedOptions.includes("")) {
-          setFilterClients([]);
-        } else {
-          const selected = selectedOptions.filter(option => option !== "").slice(0, 2);
-          setFilterClients(selected);
-        }
-      };
-
-      const resetClientFilter = () => {
-        setFilterClients([]);
-        const selectElement = document.querySelector('select[multiple]:last-of-type');
-        if (selectElement) {
-          selectElement.value = [];
-        }
-      };
-
-      const handleResultsClick = () => {
-        const password = window.prompt("Ingrese la contraseña para acceder a la Tabla de Resultados:");
-        if (password === "Llanterama24") {
-          setPasswordError("");
-          setView("results");
-        } else {
-          setPasswordError("Contraseña incorrecta. Intente de nuevo.");
-        }
-      };
-
-      const renderHome = () => (
-        <div className="flex flex-col items-center gap-8">
-          {isLoading ? (
-            <p className="text-lg sm:text-xl text-blue-300 text-center font-semibold">
-              Cargando la interfaz, por favor espera...
-            </p>
-          ) : (
-            <>
-              <div className="header-container w-full">
-                <h1 className="text-3xl sm:text-4xl font-extrabold text-white mb-2 tracking-wide header-3d">INTERFAZ - VTS - LLAN/AUT</h1>
-                <p className="text-sm sm:text-base text-blue-200 header-3d">
-                  Información confidencial · Uso interno exclusivo · Prohibida su reproducción sin autorización
+    <div id="view-cover" class="fixed inset-0 bg-llanterama z-40 flex flex-col items-center justify-center text-center p-8 overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-full opacity-20 pointer-events-none">
+            <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-500 rounded-full blur-[120px]"></div>
+            <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-yellow-500 rounded-full blur-[120px]"></div>
+        </div>
+        <div class="relative z-10 fade-in">
+            <div class="w-20 h-20 bg-yellow-500 rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-2xl rotate-3 border-4 border-white/20">
+                <i class="fas fa-shield-alt text-4xl text-blue-950"></i>
+            </div>
+            <h1 class="text-4xl font-black text-white italic tracking-tighter leading-none mb-4 uppercase">SISTEMA DE<br><span class="text-yellow-400">INTELIGENCIA</span></h1>
+            <div class="glass px-6 py-4 rounded-2xl mb-12 max-w-xs mx-auto text-center">
+                <p class="text-[10px] text-yellow-100/80 font-bold uppercase tracking-[0.2em] mb-2 text-center">Aviso de Seguridad</p>
+                <p class="text-[11px] text-blue-100 font-medium leading-relaxed opacity-80">
+                    Información exclusiva y confidencial de <span class="text-yellow-400 font-bold">Llanterama Tulancingo</span>.
                 </p>
-              </div>
-              <p className="text-lg sm:text-xl text-blue-300 text-center font-semibold">
-                Bienvenido(a) a la Interfaz de Ventas. Analice y optimice el rendimiento de su equipo con nuestras herramientas avanzadas.
-              </p>
-              {passwordError && (
-                <p className="text-red-400 text-center font-semibold">{passwordError}</p>
-              )}
-              <div className="flex flex-col sm:flex-row gap-6 flex-wrap justify-center">
-                <div className="flex flex-col items-center">
-                  <button
-                    onClick={() => setView("leaders")}
-                    className="custom-button"
-                  >
-                    Tabla de Líderes
-                  </button>
-                  <ul className="text-sm text-gray-300 mt-2 list-disc list-inside">
-                    <li>Visualice el ranking de vendedores por cantidad.</li>
-                    <li>Compare el desempeño con gráficos dinámicos.</li>
-                    <li>Filtre por vendedor, fecha y más.</li>
-                  </ul>
-                </div>
-                <div className="flex flex-col items-center">
-                  <button
-                    onClick={handleResultsClick}
-                    className="custom-button"
-                  >
-                    Tabla de Resultados
-                  </button>
-                  <ul className="text-sm text-gray-300 mt-2 list-disc list-inside">
-                    <li>Revise detalles de facturación por factura.</li>
-                    <li>Analice importes y cantidades por cliente.</li>
-                    <li>Filtre por clasificación, cliente y más.</li>
-                  </ul>
-                </div>
-              </div>
-            </>
-          )}
-        </div>
-      );
-
-      const renderLeaders = () => (
-        <div className="space-y-6">
-          <div className="header-container">
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-white mb-2 tracking-wide header-3d">INTERFAZ - VTS - LLAN/AUT</h1>
-            <p className="text-sm sm:text-base text-blue-200 header-3d">
-              Información confidencial · Uso interno exclusivo · Prohibida su reproducción sin autorización
-            </p>
-          </div>
-          <button
-            onClick={() => setView("home")}
-            className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-500 transition-colors font-semibold"
-          >
-            Volver al Inicio
-          </button>
-          <div className="section-frame flex flex-col items-center gap-4">
-            <h2 className="text-2xl sm:text-3xl font-bold text-blue-400 text-center section-title">Filtros de Ventas</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 w-full">
-              <select
-                multiple
-                size="3"
-                className="p-3 rounded-lg text-white custom-select"
-                value={filterVend}
-                onChange={handleVendorChange}
-              >
-                <option value="">Todos los Vendedores</option>
-                {vendorCodes.map((code) => (
-                  <option key={code} value={code}>{vendorNames[code] || code}</option>
-                ))}
-              </select>
-              <select
-                className="p-3 rounded-lg text-white custom-select"
-                value={filterClas}
-                onChange={(e) => setFilterClas(e.target.value)}
-              >
-                <option value="">Todas las Clasificaciones</option>
-                {clasificaciones.map((clas) => (
-                  <option key={clas} value={clas}>{clas}</option>
-                ))}
-              </select>
-              <select
-                className="p-3 rounded-lg text-white custom-select"
-                value={filterDate}
-                onChange={(e) => setFilterDate(e.target.value)}
-              >
-                <option value="">Todas las Fechas</option>
-                {fechas.map((fecha) => (
-                  <option key={fecha} value={fecha}>{fecha}</option>
-                ))}
-              </select>
-              <div className="flex items-center gap-2">
-                <select
-                  multiple
-                  size="3"
-                  className="p-3 rounded-lg text-white custom-select flex-1"
-                  value={filterClients}
-                  onChange={handleClientChange}
-                >
-                  <option value="">Todos los Clientes</option>
-                  {clientes.map((cliente) => (
-                    <option key={cliente} value={cliente}>{cliente}</option>
-                  ))}
-                </select>
-                <button
-                  onClick={resetClientFilter}
-                  className="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm font-semibold"
-                >
-                  Reiniciar
-                </button>
-              </div>
             </div>
-          </div>
-          <div className="section-frame">
-            <h3 className="text-lg sm:text-xl font-semibold text-blue-400 text-center mb-4 section-title">Tabla de Líderes</h3>
-            {error ? (
-              <p className="text-red-400 text-center">{error}</p>
-            ) : (
-              <div className="w-full h-[250px] sm:h-[350px]">
-                <canvas ref={chartRef}></canvas>
-              </div>
-            )}
-          </div>
-          <button
-            onClick={() => setView("home")}
-            className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-500 transition-colors font-semibold"
-          >
-            Volver al Inicio
-          </button>
+            <button onclick="enterApp()" class="group bg-white text-blue-950 font-black px-16 py-4 rounded-full shadow-2xl uppercase tracking-widest text-xs transition-all hover:bg-yellow-400 active:scale-95">
+                Acceder al Panel <i class="fas fa-lock-open ml-2 opacity-50 group-hover:opacity-100"></i>
+            </button>
+            <p class="mt-8 text-[8px] text-blue-300 font-bold uppercase tracking-widest opacity-40 italic">© 2025 Business Analytics Center</p>
         </div>
-      );
+    </div>
 
-      const renderResults = () => (
-        <div className="space-y-6">
-          <div className="header-container">
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-white mb-2 tracking-wide header-3d">INTERFAZ - VTS - LLAN/AUT</h1>
-            <p className="text-sm sm:text-base text-blue-200 header-3d">
-              Información confidencial · Uso interno exclusivo · Prohibida su reproducción sin autorización
-            </p>
-          </div>
-          <button
-            onClick={() => setView("home")}
-            className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-500 transition-colors font-semibold"
-          >
-            Volver al Inicio
-          </button>
-          <div className="section-frame flex flex-col items-center gap-4">
-            <h2 className="text-2xl sm:text-3xl font-bold text-blue-400 text-center section-title">Filtros de Resultados</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 w-full">
-              <select
-                multiple
-                size="3"
-                className="p-3 rounded-lg text-white custom-select"
-                value={filterVend}
-                onChange={handleVendorChange}
-              >
-                <option value="">Todos los Vendedores</option>
-                {vendorCodes.map((code) => (
-                  <option key={code} value={code}>{vendorNames[code] || code}</option>
-                ))}
-              </select>
-              <select
-                className="p-3 rounded-lg text-white custom-select"
-                value={filterClas}
-                onChange={(e) => setFilterClas(e.target.value)}
-              >
-                <option value="">Todas las Clasificaciones</option>
-                {clasificaciones.map((clas) => (
-                  <option key={clas} value={clas}>{clas}</option>
-                ))}
-              </select>
-              <select
-                className="p-3 rounded-lg text-white custom-select"
-                value={filterDate}
-                onChange={(e) => setFilterDate(e.target.value)}
-              >
-                <option value="">Todas las Fechas</option>
-                {fechas.map((fecha) => (
-                  <option key={fecha} value={fecha}>{fecha}</option>
-                ))}
-              </select>
-              <div className="flex items-center gap-2">
-                <select
-                  multiple
-                  size="3"
-                  className="p-3 rounded-lg text-white custom-select flex-1"
-                  value={filterClients}
-                  onChange={handleClientChange}
-                >
-                  <option value="">Todos los Clientes</option>
-                  {clientes.map((cliente) => (
-                    <option key={cliente} value={cliente}>{cliente}</option>
-                  ))}
-                </select>
-                <button
-                  onClick={resetClientFilter}
-                  className="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm font-semibold"
-                >
-                  Reiniciar
-                </button>
-              </div>
+    <header id="main-header" class="bg-llanterama text-white p-5 sticky top-0 z-30 shadow-xl border-b-4 border-yellow-500 hidden">
+        <div class="max-w-md mx-auto flex justify-between items-center">
+            <div onclick="location.reload()" class="cursor-pointer">
+                <h1 class="text-xl font-black italic leading-none uppercase">Llanterama</h1>
+                <p class="text-[8px] font-bold text-yellow-400 tracking-widest uppercase">Tulancingo BI</p>
             </div>
-          </div>
-          <div className="section-frame overflow-x-auto" ref={tableRef}>
-            <table className="w-full text-left border-collapse bg-gray-900 shadow-2xl rounded-lg">
-              <thead className="table-header text-white sticky top-0 z-10">
-                <tr>
-                  <th className="p-3">Vendedor</th>
-                  <th className="p-3">Clasif.</th>
-                  <th className="p-3">Descripción</th>
-                  <th className="p-3">Cant.</th>
-                  <th className="p-3">Importe</th>
-                  <th className="p-3">Cliente</th>
-                  <th className="p-3">Alm.</th>
-                  <th className="p-3">Factura</th>
-                  <th className="p-3">Fecha</th>
-                </tr>
-                <tr className="bg-green-400 text-black font-semibold">
-                  <td className="p-3"></td>
-                  <td className="p-3"></td>
-                  <td className="p-3"></td>
-                  <td className="p-3">{totals.cantidad.toLocaleString()}</td>
-                  <td className="p-3">${totals.importe.toLocaleString()}</td>
-                  <td className="p-3"></td>
-                  <td className="p-3"></td>
-                  <td className="p-3"></td>
-                  <td className="p-3"></td>
-                </tr>
-              </thead>
-              <tbody>
-                {data.length === 0 ? (
-                  <tr>
-                    <td colSpan="9" className="p-3 text-blue-300 text-center">
-                      Cargando datos desde Google Drive...
-                    </td>
-                  </tr>
-                ) : filteredData.length === 0 ? (
-                  <tr>
-                    <td colSpan="9" className="p-3 text-blue-300 text-center">
-                      No hay datos disponibles para los filtros seleccionados
-                    </td>
-                  </tr>
-                ) : (
-                  filteredData.map((item, index) => (
-                    <tr key={index} className="border-b border-gray-700 hover:bg-gray-800 transition-colors">
-                      <td className="p-3" style={{ color: vendorColors[item.codVend] || '#FFFFFF' }}>
-                        {vendorNames[item.codVend] || item.codVend}
-                      </td>
-                      <td className="p-3">{item.clasificacion}</td>
-                      <td className="p-3">{item.descripcion}</td>
-                      <td className={`p-3 ${getColor(item.cantidad, "cantidad")}`}>{item.cantidad}</td>
-                      <td className="p-3 text-green-300">${item.importe.toLocaleString()}</td>
-                      <td className="p-3">{item.cliente}</td>
-                      <td className="p-3">{item.almacen}</td>
-                      <td className="p-3">{item.factura}</td>
-                      <td className="p-3">{item.fecha}</td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-          <button
-            onClick={() => setView("home")}
-            className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-500 transition-colors font-semibold"
-          >
-            Volver al Inicio
-          </button>
+            <button onclick="renderAnalytics()" class="bg-white/10 p-2 rounded-xl border border-white/20 text-yellow-400">
+                <i class="fas fa-chart-line"></i>
+            </button>
         </div>
-      );
+    </header>
 
-      return (
-        <div>
-          {view === "home" && renderHome()}
-          {view === "leaders" && renderLeaders()}
-          {view === "results" && renderResults()}
-        </div>
-      );
-    }
+    <main class="max-w-md mx-auto p-4 pb-24">
+        <div id="content-area" class="space-y-4"></div>
+    </main>
 
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<SalesTable />);
-  </script>
+    <script>
+        // URL ACTUALIZADA
+        const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRA2Ijt1TI5_APzSJNjdlGF1_Jex0-n3iTiy8R996VR6PNx6V7tM8xO8u3sFKwp2A/pub?gid=1217270027&single=true&output=csv';
+        
+        let db = [];
+        const mesesRef = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
+
+        async function start() {
+            const loaderText = document.getElementById('loader-text');
+            const retryBtn = document.getElementById('retry-btn');
+            
+            const timeout = setTimeout(() => {
+                loaderText.innerText = "TIEMPO DE ESPERA AGOTADO";
+                retryBtn.classList.remove('hidden');
+            }, 15000); // Aumentado a 15s para dar margen
+
+            try {
+                // El parámetro &cb= ayuda a evitar que el navegador use una copia vieja del archivo (caché)
+                const response = await fetch(CSV_URL + '&cb=' + Date.now());
+                if (!response.ok) throw new Error("Google Sheets no respondió correctamente");
+                
+                const text = await response.text();
+                
+                Papa.parse(text, {
+                    header: true,
+                    skipEmptyLines: true,
+                    complete: (results) => {
+                        clearTimeout(timeout);
+                        if(results.data.length > 0) {
+                            db = results.data.filter(r => r.MES && r.AÑO);
+                            document.getElementById('loader').classList.add('hidden');
+                        } else {
+                            throw new Error("El archivo está vacío");
+                        }
+                    },
+                    error: (err) => { throw new Error(err); }
+                });
+            } catch (error) {
+                clearTimeout(timeout);
+                console.error("Error detallado:", error);
+                loaderText.innerText = "ERROR DE CONEXIÓN";
+                retryBtn.classList.remove('hidden');
+            }
+        }
+
+        // Resto de tus funciones de navegación y renderizado...
+        function enterApp() {
+            if(db.length === 0) return alert("Cargando datos...");
+            document.getElementById('view-cover').classList.add('hidden');
+            document.getElementById('main-header').classList.remove('hidden');
+            renderPeriods();
+        }
+
+        function renderPeriods() {
+            const sortedPeriods = [...new Set(db.map(r => `${r.MES} ${r.AÑO}`))].sort((a, b) => {
+                const [mesA, anoA] = a.split(' '), [mesB, anoB] = b.split(' ');
+                return anoA !== anoB ? anoB - anoA : mesesRef.indexOf(mesB) - mesesRef.indexOf(mesA);
+            });
+
+            let html = `<div onclick="renderAnalytics()" class="bg-blue-950 p-6 rounded-[2rem] text-white shadow-pro mb-6 flex justify-between items-center cursor-pointer border-b-8 border-yellow-500 relative overflow-hidden">
+                <div class="relative z-10"><p class="text-[9px] font-black text-yellow-400 uppercase italic mb-1">Centro de Análisis</p><h3 class="text-2xl font-black italic uppercase tracking-tighter">Histórico General</h3></div>
+                <i class="fas fa-layer-group text-4xl opacity-10 absolute right-4"></i></div>`;
+
+            sortedPeriods.forEach((p, idx) => {
+                const isCurrent = idx === 0;
+                const ano = p.split(' ')[1];
+                html += `<button onclick="selectMonth('${p}')" class="w-full bg-white p-5 rounded-2xl shadow-pro flex justify-between items-center mb-3 border-r-4 ${ano === '2025' ? 'border-yellow-400' : 'border-slate-300'} ${isCurrent ? 'card-current' : ''} fade-in text-left">
+                    <div>${isCurrent ? '<span class="text-[8px] font-black bg-yellow-400 text-blue-900 px-2 py-0.5 rounded-full mb-1 inline-block">MES ACTUAL</span>' : ''}
+                    <p class="font-black text-blue-900 uppercase italic text-lg tracking-tighter">${p}</p></div>
+                    <i class="fas fa-chevron-right text-slate-200"></i></button>`;
+            });
+            document.getElementById('content-area').innerHTML = html;
+        }
+
+        function selectMonth(p) {
+            const [m, a] = p.split(' ');
+            const filtered = db.filter(r => r.MES === m && r.AÑO === a);
+            renderZones(filtered, p);
+        }
+
+        function renderZones(data, period) {
+            const zones = [...new Set(data.map(r => r.ZONA))];
+            let html = `<button onclick="renderPeriods()" class="text-blue-900 font-black text-[10px] mb-6 uppercase flex items-center"><i class="fas fa-arrow-left mr-2"></i> Regresar</button>
+                        <h2 class="text-2xl font-black text-slate-800 mb-6 uppercase italic">${period}</h2>`;
+            zones.forEach(z => {
+                const rows = data.filter(r => r.ZONA === z);
+                let imp = rows.reduce((acc, r) => acc + n(r['IMPORTE NETO']), 0);
+                let util = rows.reduce((acc, r) => acc + n(r['UTILIDAD']), 0);
+                html += `<div onclick="renderSellers('${z}', '${period}')" class="bg-white rounded-3xl p-6 shadow-pro mb-4 cursor-pointer active:scale-95 transition-all">
+                    <div class="flex justify-between items-center mb-4"><span class="text-2xl font-black text-blue-950 italic uppercase tracking-tighter">${z}</span><i class="fas fa-chevron-right text-blue-100"></i></div>
+                    <div class="grid grid-cols-2 gap-4 border-t pt-4 border-slate-50">
+                        <div><p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Importe</p><p class="text-xs font-black text-slate-700">$${f(imp)}</p></div>
+                        <div><p class="text-[8px] font-black text-green-500 uppercase italic">Utilidad</p><p class="text-xs font-black text-green-600">$${f(util)}</p></div>
+                    </div></div>`;
+            });
+            document.getElementById('content-area').innerHTML = html;
+        }
+
+        function renderSellers(z, period) {
+            const [m, a] = period.split(' ');
+            const sellers = db.filter(r => r.ZONA === z && r.MES === m && r.AÑO === a);
+            let html = `<button onclick="selectMonth('${period}')" class="text-blue-900 font-black text-[10px] mb-6 uppercase flex items-center"><i class="fas fa-arrow-left mr-2"></i> Volver</button>`;
+            sellers.forEach(s => {
+                html += `<button onclick="renderReport('${s.VENDEDOR}', '${period}')" class="w-full bg-white p-5 rounded-2xl shadow-pro flex items-center justify-between border-l-8 border-yellow-500 mb-3 text-left">
+                    <p class="font-black text-slate-800 uppercase text-sm italic">${s.VENDEDOR}</p><i class="fas fa-chevron-right text-slate-200"></i></button>`;
+            });
+            document.getElementById('content-area').innerHTML = html;
+        }
+
+        function renderReport(v, period) {
+            const [m, a] = period.split(' ');
+            const d = db.find(r => r.VENDEDOR === v && r.MES === m && r.AÑO === a);
+            if (!d) return;
+
+            const cats = [
+                {n:'Premium', o:'OBJ PREMIUM', r:'REAL PREMIUM', p:'2%', c:'linea-pro'},
+                {n:'AGM', o:'OBJ AGM', r:'REAL AGM', p:'3%', c:'linea-pro'},
+                {n:'Estándar', o:'OBJ ESTANDAR', r:'REAL ESTANDAR', p:'4%', c:'linea-pro'},
+                {n:'Acumuladores', o:'OBJ ACUMULADORES', r:'REAL ACUMULADORES', p:'6%', c:'linea-pro'},
+                {n:'Lubricantes', o:'OBJ LUBRICANTES', r:'REAL LUBRICANTES', p:'8%', c:'linea-lub'},
+                {n:'Motobaterías', o:'OBJ MOTOBATERIAS', r:'REAL MOTOBATERIAS', p:'7%', c:'linea-moto'},
+                {n:'Filtros', o:'OBJ FILTROS', r:'REAL FILTROS', p:'9%', c:'linea-filt'},
+                {n:'Alcalinas', o:'OBJ ALCALINAS', r:'REAL ALCALINA', p:'10%', c:'linea-alc'},
+                {n:'Recolecciones', o:'OBJ RECOLECCIONES', r:'REAL RECOLECCIONES', p:'11%', c:'linea-rec'}
+            ];
+
+            let html = `<button onclick="renderSellers('${d.ZONA}', '${period}')" class="text-blue-900 font-black text-[10px] mb-6 uppercase flex items-center"><i class="fas fa-chevron-left mr-2"></i> Volver</button>
+                <div class="bg-llanterama p-8 rounded-[2rem] text-white shadow-2xl mb-8 border-b-8 border-yellow-500">
+                    <p class="text-[9px] font-bold text-yellow-400 uppercase tracking-widest mb-1">${period}</p>
+                    <h3 class="text-2xl font-black mb-4 uppercase italic tracking-tighter leading-tight">${d.VENDEDOR}</h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-white/10 p-4 rounded-2xl text-center"><p class="text-[8px] uppercase font-bold text-blue-200">Importe</p><p class="text-lg font-black">$${f(n(d['IMPORTE NETO']))}</p></div>
+                        <div class="bg-green-500/20 p-4 rounded-2xl text-center"><p class="text-[8px] uppercase font-bold text-green-300">Utilidad</p><p class="text-lg font-black text-green-300">$${f(n(d['UTILIDAD']))}</p></div>
+                    </div>
+                </div><div class="space-y-5">`;
+
+            cats.forEach(c => {
+                let obj = n(d[c.o]);
+                let real = n(d[c.r]);
+                let perc = obj > 0 ? (real / obj) * 100 : (real > 0 ? 100 : 0);
+                let falta = obj - real;
+
+                html += `
+                <div class="bg-white p-5 rounded-2xl shadow-pro ${c.c} fade-in">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <span class="font-black text-blue-900 uppercase text-[10px] italic mb-1 block">${c.n}</span>
+                            <span class="text-3xl font-black text-slate-800 leading-none tracking-tighter">${Math.round(perc)}%</span>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[9px] font-bold text-slate-500 uppercase">Vendidas: <span class="text-blue-900">${Math.round(real)}</span></p>
+                            ${falta > 0 ? `<p class="text-[9px] font-bold text-red-500 uppercase mt-1">Faltan: <span class="text-lg block font-black leading-none">-${Math.round(falta)}</span></p>` 
+                            : `<p class="text-[10px] font-black text-green-500 uppercase italic mt-1"><i class="fas fa-check-circle"></i> Logrado</p>`}
+                        </div>
+                    </div>
+                    <div class="w-full bg-slate-100 h-3 rounded-full overflow-hidden mb-1">
+                        <div class="h-full transition-all duration-1000 ${perc >= 100 ? 'bg-green-500' : 'bg-blue-600'}" style="width:${Math.min(perc, 100)}%"></div>
+                    </div>
+                    <div class="flex justify-between items-center text-[7px] font-bold text-slate-400 uppercase tracking-widest">
+                        <span>Progreso</span><span>Meta: ${Math.round(obj)} pz</span>
+                    </div>
+                </div>`;
+            });
+            document.getElementById('content-area').innerHTML = html + `</div>`;
+            window.scrollTo(0,0);
+        }
+
+        function renderAnalytics() {
+            let html = `<button onclick="renderPeriods()" class="text-blue-900 font-black text-[10px] mb-6 uppercase flex items-center"><i class="fas fa-arrow-left mr-2"></i> Salir de Análisis</button>
+                <div class="bg-white p-6 rounded-[2rem] shadow-pro mb-6 text-center">
+                    <p class="text-[10px] font-black text-blue-900 uppercase mb-4 italic tracking-widest">Comparativa Ventas Mensuales ($)</p>
+                    <div style="height:250px"><canvas id="lineChart"></canvas></div>
+                </div>
+                <div class="bg-white p-6 rounded-[2rem] shadow-pro mb-6 text-center">
+                    <p class="text-[10px] font-black text-blue-900 uppercase mb-4 italic tracking-widest">Venta Acumulada por Zona (Histórico)</p>
+                    <div style="height:350px"><canvas id="zoneChart"></canvas></div>
+                </div>`;
+            document.getElementById('content-area').innerHTML = html;
+            
+            const anos = [...new Set(db.map(r => r.AÑO))].sort();
+            const datasetsLine = anos.map((ano, i) => ({
+                label: `Ventas ${ano}`,
+                data: mesesRef.map(m => db.filter(r => r.MES === m && r.AÑO === ano).reduce((acc, r) => acc + n(r['IMPORTE NETO']), 0)),
+                borderColor: i === 0 ? '#94a3b8' : '#003366',
+                backgroundColor: i === 0 ? '#94a3b811' : '#00336611',
+                fill: true, tension: 0.4
+            }));
+            new Chart(document.getElementById('lineChart'), { type:'line', data:{labels:mesesRef.map(m=>m.substring(0,3)), datasets:datasetsLine}, options:{responsive:true, maintainAspectRatio:false}});
+
+            const zonas = [...new Set(db.map(r => r.ZONA))].filter(z => z);
+            const datasetsBar = anos.map((ano, i) => ({
+                label: `Total ${ano}`,
+                data: zonas.map(z => db.filter(r => r.ZONA === z && r.AÑO === ano).reduce((acc, r) => acc + n(r['IMPORTE NETO']), 0)),
+                backgroundColor: i === 0 ? '#cbd5e1' : '#eab308'
+            }));
+            new Chart(document.getElementById('zoneChart'), { type:'bar', data:{labels:zonas, datasets:datasetsBar}, options:{indexAxis:'y', responsive:true, maintainAspectRatio:false}});
+        }
+
+        function n(v) { return parseFloat(String(v || "0").replace(/[^0-9.-]+/g,"")) || 0; }
+        function f(v) { return Math.round(v).toLocaleString('es-MX'); }
+        
+        start();
+    </script>
 </body>
 </html>
